@@ -14,3 +14,5 @@ I am not a lawyer, I have no licencing plans for this at all, especially conside
 Thanks,
 
 Nathan
+
+![UI Screenshot](https://github.com/hgeddon/GEDD_JUCE_PUBLIC/blob/main/GEDDVASVF/Screenshot.png?raw=true)
