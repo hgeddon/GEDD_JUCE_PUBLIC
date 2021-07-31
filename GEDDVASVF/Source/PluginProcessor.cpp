@@ -76,7 +76,7 @@ void GeddvasvfAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 juce::AudioProcessorEditor* GeddvasvfAudioProcessor::createEditor()
 {
     //return new juce::GenericAudioProcessorEditor (*this);
-    return new VasvftestAudioProcessorEditor(*this);
+    return new GeddvasvfAudioProcessorEditor(*this);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout GeddvasvfAudioProcessor::createLayout()

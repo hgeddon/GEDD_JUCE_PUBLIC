@@ -238,7 +238,7 @@ void VASVFTraceComponent::createMagnitudePlot()
     for (auto i = 0; i != numPoints; ++i)
     {
         auto xPos = static_cast<double>(bounds.getX() + i) * xScale;
-        auto yPos = static_cast<double>(bounds.getCentreY()) - pixelsPerValue * std::log(magnitudes[i]) * std::log(2.0);
+        auto yPos = magnitudes[i] > 0 ? static_cast<double>(bounds.getCentreY()) - pixelsPerValue * std::log(magnitudes[i]) * std::log(2.0) : bounds.getBottom();
 
         // plot
         if (i == 0)

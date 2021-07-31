@@ -32,5 +32,10 @@ namespace gedd
                 return (std::log(value) - startLog) / (endLog - startLog);
             });
     }
+
+    // Basic float to text / text to float conversion methods
+    static juce::String floatValueToTextFunction(float x) { return juce::String(x, 2); }
+    static float floatTextToValueFunction(const juce::String& str) { return str.getFloatValue(); }
+
     
 }   // namespace gedd
