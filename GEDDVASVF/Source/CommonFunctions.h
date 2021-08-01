@@ -13,7 +13,13 @@
 
 namespace gedd
 {
-    
+    // Beginning index for each custom component's ColourIDs
+    namespace ComponentColourID
+    {
+        constexpr auto FrequencyDecibelGridOverlay  = 0x8800000;
+        constexpr auto VASVFTraceComponent          = 0x8800100;
+    }
+
     // Create a NormalisableRange of template type with frequency scaling
     template <typename Type = float>
     static juce::NormalisableRange<Type> createFrequencyRange(Type min, Type max)
@@ -34,9 +40,10 @@ namespace gedd
     }
 
     // Basic float to text / text to float conversion methods
-    static juce::String floatValueToTextFunction(float x) { return juce::String(x, 2); }
-    static float floatTextToValueFunction(const juce::String& str) { return str.getFloatValue(); }
+    static juce::String floatValueToTextFunction(float x)           { return juce::String(x, 2); }
+    static float floatTextToValueFunction(const juce::String& str)  { return str.getFloatValue(); }
 
+    // Math Constants
     template <typename FloatType>
     struct MathConstants
     {

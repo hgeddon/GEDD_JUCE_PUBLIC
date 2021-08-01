@@ -25,8 +25,8 @@ class VASVFTraceComponent  : public juce::Component,
 public:
     enum ColourIDs
     {
-        magnitudeTraceColourID  = 0x8800101,
-        phaseTraceColourID      = 0x8800102
+        magnitudeTraceColourID  = 0x8800100,
+        phaseTraceColourID      = 0x8800101
     };
 
     VASVFTraceComponent(EQParameterReference& ref);

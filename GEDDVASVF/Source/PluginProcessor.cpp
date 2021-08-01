@@ -92,6 +92,26 @@ juce::AudioProcessorValueTreeState::ParameterLayout GeddvasvfAudioProcessor::cre
 }
 
 //==============================================================================
+void GeddvasvfAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
+{
+    // You should use this method to store your parameters in the memory block.
+    // You could do that either as raw data, or use the XML or ValueTree classes
+    // as intermediaries to make it easy to save and load complex data.
+
+    // need to also store state of Trace's ...frequency and decibel ranges...
+
+    copyXmlToBinary(*apvts.copyState().createXml(), destData);
+}
+
+void GeddvasvfAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
+{
+    // You should use this method to restore your parameters from this memory block,
+    // whose contents will have been created by the getStateInformation() call.
+    apvts.replaceState(juce::ValueTree::fromXml(*getXmlFromBinary(data, sizeInBytes)));
+}
+
+
+//==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
