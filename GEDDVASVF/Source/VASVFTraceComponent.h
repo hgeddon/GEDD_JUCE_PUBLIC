@@ -40,9 +40,17 @@ public:
     void update();
 
     // setters
-    void setShowMagnitudeTrace(bool shouldShow) { showMagnitudes = shouldShow; }
+    void setShowMagnitudeTrace(bool shouldShow) 
+    { 
+        showMagnitudes = shouldShow; 
+        repaint();
+    }
 
-    void setShowPhaseTrace(bool shouldShow) { showPhases = shouldShow; }
+    void setShowPhaseTrace(bool shouldShow) 
+    { 
+        showPhases = shouldShow;
+        repaint();
+    }
 
     void setNumPoints(int newNumPoints);
 
@@ -50,24 +58,13 @@ public:
 
     void setFrequencyRange(juce::Range<double> r);
 
-    void setFrequencyNormalisableRange(juce::NormalisableRange<double> r) 
-    { 
-        frequencyRange = r; 
-
-        fillFrequencyVector();
-        redraw();
-    }
+    void setFrequencyNormalisableRange(juce::NormalisableRange<double> r);
 
     void setDecibelRange(double bottom, double top);
 
     void setDecibelRange(juce::Range<double> r);
 
-    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) 
-    { 
-        decibelRange = r; 
-        //repaint(); 
-        redraw();
-    }
+    void setDecibelNormalisableRange(juce::NormalisableRange<double> r);
 
     void setSampleRate(double newSampleRate);
 

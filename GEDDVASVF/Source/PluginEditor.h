@@ -114,6 +114,19 @@ public:
         dbRangeSlider.setRange(juce::Range<double>(-48.0, 48.0), 1.0);
         dbRangeSlider.setMinAndMaxValues(-24.0, 24.0, juce::NotificationType::dontSendNotification);
         dbRangeSlider.onValueChange = [&] { 
+            // Validate
+            const auto min = dbRangeSlider.getMinValue();
+            const auto max = dbRangeSlider.getMaxValue();
+
+            if (min == max) return;
+
+            if (max < min)
+            {
+                dbRangeSlider.setMinValue(max, juce::NotificationType::dontSendNotification);
+                dbRangeSlider.setMaxValue(min, juce::NotificationType::dontSendNotification);
+            }
+
+            // update
             const auto newRange = juce::NormalisableRange<double>(dbRangeSlider.getMinValue(), dbRangeSlider.getMaxValue());
             responseTrace.setDecibelNormalisableRange(newRange);
             grid.setDecibelNormalisableRange(newRange);
@@ -123,10 +136,34 @@ public:
         freqRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
         freqRangeSlider.setNormalisableRange(gedd::createFrequencyRange(1.0, 22050.0));
         freqRangeSlider.setMinAndMaxValues(20.0, 18000.0, juce::NotificationType::dontSendNotification);
+
         freqRangeSlider.onValueChange = [&] {
+            // Validate
+            const auto min = freqRangeSlider.getMinValue();
+            const auto max = freqRangeSlider.getMaxValue();
+
+            if (min == max) return;
+
+            if (max < min)
+            {
+                freqRangeSlider.setMinValue(max, juce::NotificationType::dontSendNotification);
+                freqRangeSlider.setMaxValue(min, juce::NotificationType::dontSendNotification);
+            }
+
+            // Update
             const auto newRange = gedd::createFrequencyRange(freqRangeSlider.getMinValue(), freqRangeSlider.getMaxValue());
             responseTrace.setFrequencyNormalisableRange(newRange);
             grid.setFrequencyNormalisableRange(newRange);
+        };
+
+        showMagnitudeToggle.setToggleState(responseTrace.getShowMagnitudeTrace(), juce::NotificationType::dontSendNotification);
+        showMagnitudeToggle.onStateChange = [&] {
+            responseTrace.setShowMagnitudeTrace(showMagnitudeToggle.getToggleState());
+        };
+
+        showPhaseToggle.setToggleState(responseTrace.getShowPhaseTrace(), juce::NotificationType::dontSendNotification);
+        showPhaseToggle.onStateChange = [&] {
+            responseTrace.setShowPhaseTrace(showPhaseToggle.getToggleState());
         };
 
         responseTrace.setFrequencyNormalisableRange(frequencyRange);
@@ -136,8 +173,11 @@ public:
 
         addAndMakeVisible(grid);
         addAndMakeVisible(responseTrace);
+
         addAndMakeVisible(dbRangeSlider);
         addAndMakeVisible(freqRangeSlider);
+        addAndMakeVisible(showMagnitudeToggle);
+        addAndMakeVisible(showPhaseToggle);
     }
 
     void paint(juce::Graphics& g)
@@ -148,6 +188,11 @@ public:
     void resized() override
     {
         auto bounds = getLocalBounds();
+
+        auto toggleRegion = bounds.removeFromTop(40);
+
+        showMagnitudeToggle.setBounds(toggleRegion.removeFromLeft(toggleRegion.getWidth() / 2));
+        showPhaseToggle.setBounds(toggleRegion);
 
         dbRangeSlider.setBounds(bounds.removeFromLeft(30));
         freqRangeSlider.setBounds(bounds.removeFromTop(30));
@@ -162,6 +207,8 @@ private:
 
     juce::Slider dbRangeSlider{ "dbRange" };
     juce::Slider freqRangeSlider{ "freqRange" };
+    juce::ToggleButton showMagnitudeToggle{ "mag" };
+    juce::ToggleButton showPhaseToggle{ "phase" };
 };
 
 //==============================================================================

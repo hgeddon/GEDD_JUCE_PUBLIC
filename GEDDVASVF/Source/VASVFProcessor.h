@@ -11,6 +11,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "VASVF.h"
+#include "CommonFunctions.h"
 
 /*
     Bugs:
@@ -108,7 +109,7 @@ namespace dsp
         bool                                    autoQ       { false };
         juce::LinearSmoothedValue<SampleType>   frequency   { 1000 };
         juce::LinearSmoothedValue<SampleType>   gain        { 0 };
-        juce::LinearSmoothedValue<SampleType>   q           { VASVF::State<SampleType>::inverseRootTwo };
+        juce::LinearSmoothedValue<SampleType>   q           { gedd::MathConstants<SampleType>::reciprocalSqrt2 };
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VASVFProcessor)
     };

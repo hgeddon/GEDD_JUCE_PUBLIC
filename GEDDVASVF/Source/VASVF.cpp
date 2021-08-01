@@ -78,7 +78,7 @@ typename State<NumericType>::Ptr State<NumericType>::makeBandpass(double sampleR
     const auto g = std::tan(frequency / sampleRate * juce::MathConstants<double>::pi);
     const auto k = static_cast<NumericType>(1) / q;
 
-    return *new State(a, g, k, 0, 1, 0);
+    return *new State(a, g, k, 0, 1 * k, 0);
 }
 
 template<typename NumericType>

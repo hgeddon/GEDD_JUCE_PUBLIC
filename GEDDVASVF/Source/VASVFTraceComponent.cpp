@@ -24,8 +24,8 @@ VASVFTraceComponent::VASVFTraceComponent(EQParameterReference& ref)
     setPaintingIsUnclipped(true);
     setRepaintsOnMouseActivity(false);
 
-    setColour(magnitudeTraceColourID, juce::Colours::azure);
-    setColour(phaseTraceColourID, juce::Colours::magenta);
+    setColour(magnitudeTraceColourID, juce::Colours::red);
+    setColour(phaseTraceColourID, juce::Colours::blue);
 
     freq.addListener(this);
     gain.addListener(this);
@@ -142,6 +142,16 @@ void VASVFTraceComponent::setFrequencyRange(juce::Range<double> r)
     }
 }
 
+void VASVFTraceComponent::setFrequencyNormalisableRange(juce::NormalisableRange<double> r)
+{
+    if (r.getRange().getLength() <= 0) return;
+
+    frequencyRange = r;
+
+    fillFrequencyVector();
+    redraw();
+}
+
 void VASVFTraceComponent::setDecibelRange(double bottom, double top)
 {
     setDecibelRange(juce::Range<double>(bottom, top));
@@ -158,6 +168,15 @@ void VASVFTraceComponent::setDecibelRange(juce::Range<double> r)
 
         update();
     }
+}
+
+void VASVFTraceComponent::setDecibelNormalisableRange(juce::NormalisableRange<double> r)
+{
+    if (r.getRange().getLength() <= 0) return;
+
+    decibelRange = r;
+
+    redraw();
 }
 
 void VASVFTraceComponent::setSampleRate(double newSampleRate)
@@ -252,7 +271,9 @@ void VASVFTraceComponent::createMagnitudePlot()
 void VASVFTraceComponent::createPhasePlot()  // rather than db shouldn't it be in phases?
 {
     auto bounds = getLocalBounds();
-    const auto pixelsPerValue = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
+    //const auto ppv = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
+    //const auto pixelsPerValue = 1.0 / bounds.getHeight();
+
     const auto xScale = static_cast<double>(bounds.getWidth()) / static_cast<double>(numPoints - 1);
     const auto phaseFloor = -juce::MathConstants<double>::pi;
     const auto phaseCeiling = juce::MathConstants<double>::pi;
@@ -262,16 +283,10 @@ void VASVFTraceComponent::createPhasePlot()  // rather than db shouldn't it be i
 
     for (auto i = 0; i != numPoints; ++i)
     {
-        auto xPos = static_cast<double>(bounds.getX() + i) * xScale;
-        auto yPos = 0.0;
+        const auto phase = juce::jlimit(phaseFloor, phaseCeiling, phases[i]) * gedd::MathConstants<double>::reciprocalTwopi;
 
-        // clamp yPos
-        if (phases[i] < phaseFloor)
-            yPos = bounds.getBottom();
-        else if (phases[i] > phaseCeiling)
-            yPos = bounds.getY();
-        else
-            yPos = static_cast<double>(bounds.getCentreY()) - pixelsPerValue * (phases[i] / juce::MathConstants<double>::halfPi);
+        const auto xPos = static_cast<double>(bounds.getX() + i) * xScale;
+        const auto yPos = bounds.getCentreY() - ((phase * bounds.getHeight()) + bounds.getY());
 
         // plot
         if (i == 0)

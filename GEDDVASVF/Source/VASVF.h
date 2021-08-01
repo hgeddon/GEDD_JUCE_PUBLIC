@@ -176,8 +176,6 @@ namespace VASVF {
         static NumericType calculateAutoQ(NumericType q, NumericType gain, bool aq) noexcept;
 
         std::array<NumericType, 9> data;    // a, g, k, m0, m1, m2, a1, a2, a3
-
-        static constexpr NumericType inverseRootTwo = static_cast<NumericType> (0.70710678118654752440L);
     };
 
 }   // namespace VASVF

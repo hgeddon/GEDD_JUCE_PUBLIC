@@ -65,6 +65,8 @@ void FrequencyDecibelGridOverlay::setFrequencyRange(juce::Range<double> r)
 
 void FrequencyDecibelGridOverlay::setFrequencyNormalisableRange(juce::NormalisableRange<double> r)
 {
+    if (r.getRange().getLength() <= 0) return;
+
     frequencyRange = r;
 
     frequencyMarkers.makeDecades(r.getRange());
@@ -86,6 +88,20 @@ void FrequencyDecibelGridOverlay::setDecibelRange(juce::Range<double> r)
         decibelRange.start = r.getStart();
         decibelRange.end = r.getEnd();
     }
+}
+
+void FrequencyDecibelGridOverlay::setDecibelNormalisableRange(juce::NormalisableRange<double> r)
+{
+    if (r.getRange().getLength() <= 0) return;
+
+    decibelRange = r;
+    repaint();
+}
+
+void FrequencyDecibelGridOverlay::setGridThicknessPx(int t)
+{
+    jassert(t > 0); 
+    gridThicknessPx = t;
 }
 
 void FrequencyDecibelGridOverlay::paint(juce::Graphics& g)
@@ -110,7 +126,7 @@ void FrequencyDecibelGridOverlay::paintFrequencyGrid(juce::Graphics& g)
     for (auto i = 0; i != num; ++i)
     {
         const auto marker = frequencyMarkers.markers[i];
-        const auto xPos = (frequencyRange.convertTo0to1(marker) * bounds.getWidth()) + bounds.getX();
+        const auto xPos = (frequencyRange.convertTo0to1(frequencyRange.snapToLegalValue(marker)) * bounds.getWidth()) + bounds.getX();
 
         // draw line
         g.setColour(findColour(gridColourID));
@@ -122,9 +138,10 @@ void FrequencyDecibelGridOverlay::paintFrequencyGrid(juce::Graphics& g)
 
         switch (marker)
         {
-        case 100:   drawFrequencyLabels(g, juce::StringArray(decadeStrings)[0], xPos, textBaseLine); break;
-        case 1000:  drawFrequencyLabels(g, juce::StringArray(decadeStrings)[1], xPos, textBaseLine); break;
-        case 10000: drawFrequencyLabels(g, juce::StringArray(decadeStrings)[2], xPos, textBaseLine); break;
+        case 10:    drawFrequencyLabels(g, juce::StringArray(decadeStrings)[0], xPos, textBaseLine); break;
+        case 100:   drawFrequencyLabels(g, juce::StringArray(decadeStrings)[1], xPos, textBaseLine); break;
+        case 1000:  drawFrequencyLabels(g, juce::StringArray(decadeStrings)[2], xPos, textBaseLine); break;
+        case 10000: drawFrequencyLabels(g, juce::StringArray(decadeStrings)[3], xPos, textBaseLine); break;
         }
     }
 }

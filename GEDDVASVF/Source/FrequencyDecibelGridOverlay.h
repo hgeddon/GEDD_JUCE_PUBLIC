@@ -108,11 +108,11 @@ public:
 
     void setDecibelRange(juce::Range<double> r);
 
-    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) { decibelRange = r; repaint(); }
+    void setDecibelNormalisableRange(juce::NormalisableRange<double> r);
 
     void setFont(juce::Font f) { textFont = f; }
 
-    void setGridThicknessPx(int t) { jassert(t > 0); gridThicknessPx = t; }
+    void setGridThicknessPx(int t);
 
     // getters
     juce::Font getFont() const { return textFont; }
@@ -140,7 +140,7 @@ private:
 
     void paintDecibelGrid(juce::Graphics& g);
 
-    static constexpr auto decadeStrings = { "100", "1k", "10k" };
+    static constexpr auto decadeStrings = { "10", "100", "1k", "10k" };
 
     FrequencyMarkers frequencyMarkers;
 
