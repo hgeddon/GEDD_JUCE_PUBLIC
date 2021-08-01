@@ -102,12 +102,32 @@ public:
     {
         setOpaque(true);
         setBufferedToImage(true);
-        setInterceptsMouseClicks(false, false);
+        setInterceptsMouseClicks(false, true);
         setPaintingIsUnclipped(true);
         setRepaintsOnMouseActivity(false);
 
         const auto frequencyRange = gedd::createFrequencyRange(20.0, 22000.0);
         const auto decibelRange = juce::NormalisableRange<double>(-24.0, 24.0);
+
+        dbRangeSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueVertical);
+        dbRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        dbRangeSlider.setRange(juce::Range<double>(-48.0, 48.0), 1.0);
+        dbRangeSlider.setMinAndMaxValues(-24.0, 24.0, juce::NotificationType::dontSendNotification);
+        dbRangeSlider.onValueChange = [&] { 
+            const auto newRange = juce::NormalisableRange<double>(dbRangeSlider.getMinValue(), dbRangeSlider.getMaxValue());
+            responseTrace.setDecibelNormalisableRange(newRange);
+            grid.setDecibelNormalisableRange(newRange);
+        };
+
+        freqRangeSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
+        freqRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        freqRangeSlider.setNormalisableRange(gedd::createFrequencyRange(1.0, 22050.0));
+        freqRangeSlider.setMinAndMaxValues(20.0, 18000.0, juce::NotificationType::dontSendNotification);
+        freqRangeSlider.onValueChange = [&] {
+            const auto newRange = gedd::createFrequencyRange(freqRangeSlider.getMinValue(), freqRangeSlider.getMaxValue());
+            responseTrace.setFrequencyNormalisableRange(newRange);
+            grid.setFrequencyNormalisableRange(newRange);
+        };
 
         responseTrace.setFrequencyNormalisableRange(frequencyRange);
         responseTrace.setDecibelNormalisableRange(decibelRange);
@@ -116,6 +136,8 @@ public:
 
         addAndMakeVisible(grid);
         addAndMakeVisible(responseTrace);
+        addAndMakeVisible(dbRangeSlider);
+        addAndMakeVisible(freqRangeSlider);
     }
 
     void paint(juce::Graphics& g)
@@ -125,7 +147,10 @@ public:
 
     void resized() override
     {
-        const auto bounds = getLocalBounds();
+        auto bounds = getLocalBounds();
+
+        dbRangeSlider.setBounds(bounds.removeFromLeft(30));
+        freqRangeSlider.setBounds(bounds.removeFromTop(30));
 
         grid.setBounds(bounds);
         responseTrace.setBounds(bounds);
@@ -134,6 +159,9 @@ public:
 private:
     VASVFTraceComponent responseTrace;
     FrequencyDecibelGridOverlay grid;
+
+    juce::Slider dbRangeSlider{ "dbRange" };
+    juce::Slider freqRangeSlider{ "freqRange" };
 };
 
 //==============================================================================

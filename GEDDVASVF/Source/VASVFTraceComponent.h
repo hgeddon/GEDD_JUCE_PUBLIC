@@ -25,8 +25,8 @@ class VASVFTraceComponent  : public juce::Component,
 public:
     enum ColourIDs
     {
-        magnitudeTraceColourID = 0x8800501,
-        phaseTraceColourID = 0x8800502
+        magnitudeTraceColourID  = 0x8800101,
+        phaseTraceColourID      = 0x8800102
     };
 
     VASVFTraceComponent(EQParameterReference& ref);
@@ -50,13 +50,24 @@ public:
 
     void setFrequencyRange(juce::Range<double> r);
 
-    void setFrequencyNormalisableRange(juce::NormalisableRange<double> r) { frequencyRange = r; }
+    void setFrequencyNormalisableRange(juce::NormalisableRange<double> r) 
+    { 
+        frequencyRange = r; 
+
+        fillFrequencyVector();
+        redraw();
+    }
 
     void setDecibelRange(double bottom, double top);
 
     void setDecibelRange(juce::Range<double> r);
 
-    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) { decibelRange = r; }
+    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) 
+    { 
+        decibelRange = r; 
+        //repaint(); 
+        redraw();
+    }
 
     void setSampleRate(double newSampleRate);
 
@@ -76,6 +87,8 @@ public:
     juce::NormalisableRange<double> getDecibelNormalisableRange() const { return decibelRange; }
 
 private:
+    void redraw() noexcept;
+
     void handleUpdate() noexcept;
 
     void parameterValueChanged(int parameterIndex, float newValue);
@@ -99,7 +112,6 @@ private:
     juce::NormalisableRange<double> decibelRange{ -24.0, 24.0 };
 
     double  sampleRate{ 44100.0 };
-    //float   dbRange         { 24.0f };
     int     numPoints{ 256 };
     bool    showMagnitudes{ true };
     bool    showPhases{ true };
@@ -115,8 +127,6 @@ private:
     std::vector<double> frequencies;
     std::vector<double> magnitudes;
     std::vector<double> phases;
-
-    juce::Range<double> freqLogBounds{ std::log(20.0), std::log(18000.0) };
 
     juce::Path frequencyPath;
     juce::Path phasePath;

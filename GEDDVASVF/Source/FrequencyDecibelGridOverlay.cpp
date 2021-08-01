@@ -68,6 +68,8 @@ void FrequencyDecibelGridOverlay::setFrequencyNormalisableRange(juce::Normalisab
     frequencyRange = r;
 
     frequencyMarkers.makeDecades(r.getRange());
+
+    repaint();
 }
 
 void FrequencyDecibelGridOverlay::setDecibelRange(double bottom, double top)
@@ -135,9 +137,9 @@ void FrequencyDecibelGridOverlay::drawFrequencyLabels(juce::Graphics& g, juce::S
 
 void FrequencyDecibelGridOverlay::drawDecibelLine(juce::Graphics& g, const int db, const int textStartX)
 {
-    const auto bounds = getBounds();
+    const auto bounds = getLocalBounds();
     const auto str = juce::String(db);
-    const auto yPos = (decibelRange.convertTo0to1(static_cast<double>(db)) * bounds.getHeight()) + bounds.getX();
+    const auto yPos = bounds.getBottom() - ((decibelRange.convertTo0to1(static_cast<double>(db)) * bounds.getHeight()) + bounds.getX());
 
     g.setColour(findColour(gridColourID));
     g.drawHorizontalLine(yPos, bounds.getX(), bounds.getRight());
@@ -148,20 +150,12 @@ void FrequencyDecibelGridOverlay::drawDecibelLine(juce::Graphics& g, const int d
 
 void FrequencyDecibelGridOverlay::paintDecibelGrid(juce::Graphics& g)
 {
-    const auto bounds = getLocalBounds();
-    const auto textStartX = bounds.getX() + paddingPx;
-
-    // draw centre line
-    g.setColour(findColour(gridColourID));
-    g.drawHorizontalLine(bounds.getCentreY(), bounds.getX(), bounds.getRight());
-
+    const auto textStartX = getLocalBounds().getX() + paddingPx;
     const auto dbLength = decibelRange.getRange().getLength();
-
+    const auto start = decibelRange.getRange().getStart();
+    const auto end = decibelRange.getRange().getEnd();
     const auto dbStep = (dbLength > 24) ? 6 : (dbLength > 12) ? 3 : 1;
 
-    for (auto db = dbStep; db < decibelRange.getRange().getEnd(); db += dbStep)
-    {
-        drawDecibelLine(g, db, textStartX); // up
-        drawDecibelLine(g, -db, textStartX); // dowm
-    }
+    for (auto db = start; db < end; db += dbStep)
+        drawDecibelLine(g, db, textStartX);
 }

@@ -89,8 +89,8 @@ public:
 
     enum ColourIDs
     {
-        gridColourID = 0x8800600,
-        textColourID = 0x8800601
+        gridColourID = 0x8800000,
+        textColourID = 0x8800001
     };
 
     FrequencyDecibelGridOverlay();
@@ -108,7 +108,7 @@ public:
 
     void setDecibelRange(juce::Range<double> r);
 
-    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) { decibelRange = r; }
+    void setDecibelNormalisableRange(juce::NormalisableRange<double> r) { decibelRange = r; repaint(); }
 
     void setFont(juce::Font f) { textFont = f; }
 

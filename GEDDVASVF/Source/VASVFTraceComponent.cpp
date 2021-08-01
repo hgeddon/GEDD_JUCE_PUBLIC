@@ -53,13 +53,13 @@ VASVFTraceComponent::~VASVFTraceComponent()
 
 void VASVFTraceComponent::paint (juce::Graphics& g)
 {
-    if (showMagnitudes)
+    if (showMagnitudes && !frequencyPath.isEmpty())
     {
         g.setColour(findColour(magnitudeTraceColourID));
         g.strokePath(frequencyPath, juce::PathStrokeType(1.5f));
     }
 
-    if (showPhases)
+    if (showPhases && !phasePath.isEmpty())
     {
         g.setColour(findColour(phaseTraceColourID));
         g.strokePath(phasePath, juce::PathStrokeType(1.5f));
@@ -107,12 +107,7 @@ void VASVFTraceComponent::update()
     if (newState)
     {
         displayState = *newState;
-
-        updateMagnitudes();
-        updatePhases();
-        createMagnitudePlot();
-        createPhasePlot();
-        repaint();
+        redraw();
     }
 }
 
@@ -142,10 +137,7 @@ void VASVFTraceComponent::setFrequencyRange(juce::Range<double> r)
         frequencyRange.start = r.getStart();
         frequencyRange.end = r.getEnd();
 
-        freqLogBounds = juce::Range<double>(std::log(r.getStart()), std::log(r.getEnd()));
-
         fillFrequencyVector();
-
         update();
     }
 }
@@ -180,6 +172,15 @@ void VASVFTraceComponent::setSampleRate(double newSampleRate)
     }
 }
 
+void VASVFTraceComponent::redraw() noexcept
+{
+    updateMagnitudes();
+    updatePhases();
+    createMagnitudePlot();
+    createPhasePlot();
+    repaint();
+}
+
 void VASVFTraceComponent::handleUpdate() noexcept
 {
     if (juce::MessageManager::getInstance()->isThisTheMessageThread())
@@ -209,8 +210,8 @@ void VASVFTraceComponent::fillFrequencyVector()
 
     auto resolution = 1.0 / static_cast<double>(numPoints - 1);
 
-    for (auto i = 0; i < numPoints; ++i)
-        frequencies[i] = std::exp((static_cast<double>(i) * resolution) * (freqLogBounds.getEnd() - freqLogBounds.getStart()) + freqLogBounds.getStart());
+    for (auto i = 0; i != numPoints; ++i)
+        frequencies[i] = frequencyRange.convertFrom0to1(static_cast<double>(i) * resolution);
 }
 
 void VASVFTraceComponent::updateMagnitudes()
@@ -225,8 +226,7 @@ void VASVFTraceComponent::updatePhases()
 
 void VASVFTraceComponent::createMagnitudePlot()
 {
-    auto bounds = getLocalBounds();
-
+    const auto bounds = getLocalBounds();
     const auto pixelsPerValue = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
     const auto xScale = static_cast<double>(bounds.getWidth()) / static_cast<double>(numPoints - 1);
     const auto gainFloor = static_cast<double>(juce::Decibels::decibelsToGain(decibelRange.start));
@@ -237,8 +237,9 @@ void VASVFTraceComponent::createMagnitudePlot()
 
     for (auto i = 0; i != numPoints; ++i)
     {
-        auto xPos = static_cast<double>(bounds.getX() + i) * xScale;
-        auto yPos = magnitudes[i] > 0 ? static_cast<double>(bounds.getCentreY()) - pixelsPerValue * std::log(magnitudes[i]) * std::log(2.0) : bounds.getBottom();
+        const auto xPos = static_cast<double>(bounds.getX() + i) * xScale;
+        const auto db = decibelRange.convertTo0to1(decibelRange.snapToLegalValue(juce::Decibels::gainToDecibels(magnitudes[i])));
+        const auto yPos = bounds.getHeight() - ((db * bounds.getHeight()) + bounds.getY());
 
         // plot
         if (i == 0)
@@ -251,7 +252,6 @@ void VASVFTraceComponent::createMagnitudePlot()
 void VASVFTraceComponent::createPhasePlot()  // rather than db shouldn't it be in phases?
 {
     auto bounds = getLocalBounds();
-
     const auto pixelsPerValue = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
     const auto xScale = static_cast<double>(bounds.getWidth()) / static_cast<double>(numPoints - 1);
     const auto phaseFloor = -juce::MathConstants<double>::pi;
