@@ -25,7 +25,7 @@ VASVFTraceComponent::VASVFTraceComponent(EQParameterReference& ref)
     setRepaintsOnMouseActivity(false);
 
     setColour(magnitudeTraceColourID, juce::Colours::red);
-    setColour(phaseTraceColourID, juce::Colours::blue);
+    setColour(phaseTraceColourID, juce::Colours::blue.brighter());
 
     freq.addListener(this);
     gain.addListener(this);

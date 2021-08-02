@@ -50,6 +50,10 @@ namespace dsp
 
         bool getAutoQ() const { return autoQ; }
 
+        double getRampDurationSeconds() const { return rampDurationSeconds; }
+
+        double getSampleRate() const { return sampleRate; }
+
         // Dsp methods
         void prepare(const juce::dsp::ProcessSpec& spec) noexcept;
 

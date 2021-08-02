@@ -21,7 +21,7 @@ GeddvasvfAudioProcessorEditor::GeddvasvfAudioProcessorEditor (GeddvasvfAudioProc
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (800, 600);
+    setSize (800, 400);
 
     addAndMakeVisible(filterTypeCombo);
     addAndMakeVisible(freqSlider);
@@ -37,6 +37,7 @@ GeddvasvfAudioProcessorEditor::GeddvasvfAudioProcessorEditor (GeddvasvfAudioProc
     parameterSmoothingSlider.setTextValueSuffix(" s");
     parameterSmoothingSlider.setRange(juce::Range<double>(0.001, 1.0), 0.0);
     parameterSmoothingSlider.setNumDecimalPlacesToDisplay(3);
+    parameterSmoothingSlider.setValue(audioProcessor.getSvfProcessorRef().getRampDurationSeconds());
 
     parameterSmoothingSlider.onValueChange = [&] {
         audioProcessor.getSvfProcessorRef().setRampDurationSeconds(parameterSmoothingSlider.getValue());
@@ -57,19 +58,21 @@ void GeddvasvfAudioProcessorEditor::paint (juce::Graphics& g)
 void GeddvasvfAudioProcessorEditor::resized()
 {
     const auto sliderWidth = 80;
-    const auto comboHeight = 80;
+    const auto comboHeight = 60;
+    const auto comboWidth = 160;
 
     auto bounds = getLocalBounds();
     auto controlRegion = bounds.removeFromLeft(sliderWidth * 4);
+    auto controlTopBar = controlRegion.removeFromTop(comboHeight);
 
-    autoqToggle.setBounds(controlRegion.removeFromTop(comboHeight));
-    filterTypeCombo.setBounds(controlRegion.removeFromTop(comboHeight));
+    filterTypeCombo.setBounds(controlTopBar.removeFromLeft(comboWidth));
+    autoqToggle.setBounds(controlTopBar);
 
     freqSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
     qSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
     gainSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
 
-    parameterSmoothingSlider.setBounds(controlRegion);
+    parameterSmoothingSlider.setBounds(controlRegion.reduced(0, 20));
 
-    responseTrace.setBounds(bounds.reduced(30));
+    responseTrace.setBounds(bounds.reduced(20));
 }

@@ -180,22 +180,104 @@ public:
         grid.setFrequencyNormalisableRange(frequencyRange);
         grid.setDecibelNormalisableRange(decibelRange);
 
+        // labels
         dbLabelTop.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
         dbLabelTop.setJustificationType(juce::Justification::centred);
         dbLabelTop.setText(juce::String(static_cast<int>(dbRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+        dbLabelTop.setEditable(true, false, true);
+        dbLabelTop.onTextChange = [&] {
+            auto t = dbLabelTop.getText().trimStart();
+
+            while (t.startsWithChar('+'))
+                t = t.substring(1).trimStart();
+
+            auto valStr = t.initialSectionContainingOnly("0123456789.,-");
+            auto valDbl = valStr.getDoubleValue();
+
+            if (valDbl > dbRangeSlider.getMinValue())
+            {
+                dbRangeSlider.setMaxValue(valDbl, juce::NotificationType::sendNotificationAsync);
+                dbLabelTop.setText(valStr, juce::NotificationType::dontSendNotification);
+            }
+            else
+            {
+                dbLabelTop.setText(juce::String(static_cast<int>(dbRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+            }
+        };
         
         dbLabelBottom.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
         dbLabelBottom.setJustificationType(juce::Justification::centred);
         dbLabelBottom.setText(juce::String(static_cast<int>(dbRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+        dbLabelBottom.setEditable(true, false, true);
+        dbLabelBottom.onTextChange = [&] {
+            auto t = dbLabelBottom.getText().trimStart();
+
+            while (t.startsWithChar('+'))
+                t = t.substring(1).trimStart();
+
+            auto valStr = t.initialSectionContainingOnly("0123456789.,-");
+            auto valDbl = valStr.getDoubleValue();
+
+            if (valDbl < dbRangeSlider.getMaxValue())
+            {
+                dbRangeSlider.setMinValue(valDbl, juce::NotificationType::sendNotificationAsync);
+                dbLabelBottom.setText(valStr, juce::NotificationType::dontSendNotification);
+            }
+            else
+            {
+                dbLabelBottom.setText(juce::String(static_cast<int>(dbRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+            }
+        };
 
         freqLabelLeft.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
         freqLabelLeft.setJustificationType(juce::Justification::centredRight);
         freqLabelLeft.setText(juce::String(static_cast<int>(freqRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+        freqLabelLeft.setEditable(true, false, true);
+        freqLabelLeft.onTextChange = [&] {
+            auto t = freqLabelLeft.getText().trimStart();
+
+            while (t.startsWithChar('+'))
+                t = t.substring(1).trimStart();
+
+            auto valStr = t.initialSectionContainingOnly("0123456789.,-");
+            auto valDbl = valStr.getDoubleValue();
+
+            if (valDbl < freqRangeSlider.getMaxValue())
+            {
+                freqRangeSlider.setMinValue(valDbl, juce::NotificationType::sendNotificationAsync);
+                freqLabelLeft.setText(valStr, juce::NotificationType::dontSendNotification);
+            }
+            else
+            {
+                freqLabelLeft.setText(juce::String(static_cast<int>(freqRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+            }
+        };
 
         freqLabelRight.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
         freqLabelRight.setJustificationType(juce::Justification::centredLeft);
         freqLabelRight.setText(juce::String(static_cast<int>(freqRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+        freqLabelRight.setEditable(true, false, true);
+        freqLabelRight.onTextChange = [&] {
+            auto t = freqLabelRight.getText().trimStart();
 
+            while (t.startsWithChar('+'))
+                t = t.substring(1).trimStart();
+
+            auto valStr = t.initialSectionContainingOnly("0123456789.,-");
+            auto valDbl = valStr.getDoubleValue();
+
+            if (valDbl > freqRangeSlider.getMinValue())
+            {
+                freqRangeSlider.setMaxValue(valDbl, juce::NotificationType::sendNotificationAsync);
+                freqLabelRight.setText(valStr, juce::NotificationType::dontSendNotification);
+            }
+            else
+            {
+                freqLabelRight.setText(juce::String(static_cast<int>(freqRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+            }
+        };
+
+        // add to component and make visible
         addAndMakeVisible(grid);
         addAndMakeVisible(responseTrace);
 
