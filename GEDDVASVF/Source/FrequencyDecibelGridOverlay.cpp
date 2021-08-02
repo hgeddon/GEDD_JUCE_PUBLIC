@@ -154,6 +154,8 @@ void FrequencyDecibelGridOverlay::drawFrequencyLabels(juce::Graphics& g, juce::S
 
 void FrequencyDecibelGridOverlay::drawDecibelLine(juce::Graphics& g, const int db, const int textStartX)
 {
+    if (db > decibelRange.end || db < decibelRange.start) return;   // out of range, return
+
     const auto bounds = getLocalBounds();
     const auto str = juce::String(db);
     const auto yPos = bounds.getBottom() - ((decibelRange.convertTo0to1(static_cast<double>(db)) * bounds.getHeight()) + bounds.getX());
@@ -169,9 +171,14 @@ void FrequencyDecibelGridOverlay::paintDecibelGrid(juce::Graphics& g)
 {
     const auto textStartX = getLocalBounds().getX() + paddingPx;
     const auto dbLength = decibelRange.getRange().getLength();
-    const auto start = decibelRange.getRange().getStart();
-    const auto end = decibelRange.getRange().getEnd();
     const auto dbStep = (dbLength > 24) ? 6 : (dbLength > 12) ? 3 : 1;
+
+    // snap start and end to nearest multiple of dbStep
+    auto start = static_cast<int>(decibelRange.getRange().getStart());
+    start -= (start < 0) ? gedd::reverseModulo(start, dbStep) : start % dbStep;
+
+    auto end = static_cast<int>(decibelRange.getRange().getEnd());
+    end += (end < 0) ? gedd::reverseModulo(end, dbStep) : end % dbStep;
 
     for (auto db = start; db < end; db += dbStep)
         drawDecibelLine(g, db, textStartX);

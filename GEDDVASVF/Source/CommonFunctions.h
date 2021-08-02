@@ -68,4 +68,25 @@ namespace gedd
         static constexpr FloatType reciprocalSqrt2 = static_cast<FloatType> (0.70710678118654752440L);
     };
 
+    // gets the previous power of 2 to compliment juce::nextPowerOfTwo
+    inline int lastPowerOfTwo(int n) noexcept
+    {
+        n |= (n >> 1);
+        n |= (n >> 2);
+        n |= (n >> 4);
+        n |= (n >> 8);
+        n |= (n >> 16);
+        return n - (n >> 1);
+    }
+
+    /* Integer modulo for negative values */
+    static int reverseModulo(int x, int y)
+    {
+        jassert(x < 0); // why use it if not negative?
+
+        auto z = y - ((0 - x) % y);
+        if (z == y) z = 0;
+        return z;
+    }
+
 }   // namespace gedd
