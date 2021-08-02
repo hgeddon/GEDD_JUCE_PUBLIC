@@ -77,7 +77,6 @@ namespace VASVF {
 
         void snapToZero() noexcept;
 
-        // if only using this then need to also call updateStateIfRequired(), skip() and snapToZero()
         SampleType JUCE_VECTOR_CALLTYPE processSample(SampleType v0) noexcept;
 
         template<typename ProcessContext>

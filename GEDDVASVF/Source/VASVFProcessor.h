@@ -13,19 +13,11 @@
 #include "VASVF.h"
 #include "CommonFunctions.h"
 
-/*
-    Bugs:
-
-    - is autoQ working on bell and shelfs?
-    - maybe autoQ should be limited to prevent huge q values at high / low gains?
-*/
-
 namespace gedd
 {
 namespace dsp
 {
-    // Container class for VASVF::Filter with smoothed values
-    // add processDuplicator eventually
+    // Multi-mono container class for VASVF::Filter with smoothed values
     template<typename SampleType = float>
     class VASVFProcessor
     {
@@ -65,10 +57,7 @@ namespace dsp
 
         void skip(int numSampleToSkip) noexcept;
 
-        void update() noexcept; // if anything changes then make new state
-
-        // if only using this then need to also call updateStateIfRequired(), skip() and snapToZero()
-        //SampleType processSample(SampleType v0) noexcept;
+        void update() noexcept;
 
         template<typename ProcessContext = juce::dsp::ProcessContextReplacing<float>>
         void process(const ProcessContext& context) noexcept
@@ -99,7 +88,6 @@ namespace dsp
     private:
         double sampleRate{ 0.0 }, rampDurationSeconds{ 0.05 };
 
-        // state isn't getting through to VASVF::Filter...
         juce::dsp::ProcessorDuplicator<VASVF::Filter<SampleType>, VASVF::State<SampleType>> filterProcessor;
  
         bool shouldUpdate{ true };

@@ -39,6 +39,8 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    gedd::dsp::VASVFProcessor<float>& getSvfProcessorRef() { return svfProcessor; }
+
 private:
     ParameterReferences paramRef;
 

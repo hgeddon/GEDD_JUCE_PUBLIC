@@ -260,11 +260,11 @@ NumericType State<NumericType>::calculateAutoQ(NumericType q, NumericType gain, 
         return q;
 }
 
-//=====
+//========================================================================
 template struct State<float>;
 template struct State<double>;
 
-//======================
+//========================================================================
 template<typename SampleType>
 Filter<SampleType>::Filter()
     : coeffs(new State<typename Filter<SampleType>::NumericType>(1, 1, 1, 0, 0, 0))
@@ -316,10 +316,6 @@ SampleType JUCE_VECTOR_CALLTYPE Filter<SampleType>::processSample(SampleType v0)
     const auto v3 = v0 - ic2;
     const auto v1 = s[static_cast<size_t>(6)] * ic1 + s[static_cast<size_t>(7)] * v3;
     const auto v2 = ic2 + s[static_cast<size_t>(7)] * ic1 + s[static_cast<size_t>(8)] * v3;
-
-    // try clipping? - nope, doesn't do much good here...
-    //ic1 = std::tanh(static_cast<SampleType>(2) * v1 - ic1);
-    //ic2 = std::tanh(static_cast<SampleType>(2) * v2 - ic2);
 
     ic1 = static_cast<SampleType>(2) * v1 - ic1;
     ic2 = static_cast<SampleType>(2) * v2 - ic2;

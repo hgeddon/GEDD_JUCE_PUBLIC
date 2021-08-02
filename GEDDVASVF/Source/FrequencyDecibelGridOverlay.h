@@ -15,6 +15,7 @@
 
 //==============================================================================
 /*
+* Bugs: - db lines should always centre around 0
 */
 class FrequencyDecibelGridOverlay : public juce::Component
 {

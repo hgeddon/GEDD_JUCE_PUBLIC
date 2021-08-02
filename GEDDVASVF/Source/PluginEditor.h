@@ -113,6 +113,8 @@ public:
         dbRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
         dbRangeSlider.setRange(juce::Range<double>(-48.0, 48.0), 1.0);
         dbRangeSlider.setMinAndMaxValues(-24.0, 24.0, juce::NotificationType::dontSendNotification);
+
+        // lambda
         dbRangeSlider.onValueChange = [&] { 
             // Validate
             const auto min = dbRangeSlider.getMinValue();
@@ -130,13 +132,17 @@ public:
             const auto newRange = juce::NormalisableRange<double>(dbRangeSlider.getMinValue(), dbRangeSlider.getMaxValue());
             responseTrace.setDecibelNormalisableRange(newRange);
             grid.setDecibelNormalisableRange(newRange);
+
+            dbLabelBottom.setText(juce::String(static_cast<int>(min)), juce::NotificationType::dontSendNotification);
+            dbLabelTop.setText(juce::String(static_cast<int>(max)), juce::NotificationType::dontSendNotification);
         };
 
         freqRangeSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
         freqRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-        freqRangeSlider.setNormalisableRange(gedd::createFrequencyRange(1.0, 22050.0));
+        freqRangeSlider.setNormalisableRange(gedd::createFrequencyRange(1.0, 22050.0, 1.0));
         freqRangeSlider.setMinAndMaxValues(20.0, 18000.0, juce::NotificationType::dontSendNotification);
 
+        // lambda
         freqRangeSlider.onValueChange = [&] {
             // Validate
             const auto min = freqRangeSlider.getMinValue();
@@ -154,6 +160,9 @@ public:
             const auto newRange = gedd::createFrequencyRange(freqRangeSlider.getMinValue(), freqRangeSlider.getMaxValue());
             responseTrace.setFrequencyNormalisableRange(newRange);
             grid.setFrequencyNormalisableRange(newRange);
+
+            freqLabelLeft.setText(juce::String(static_cast<int>(min)), juce::NotificationType::dontSendNotification);
+            freqLabelRight.setText(juce::String(static_cast<int>(max)), juce::NotificationType::dontSendNotification);
         };
 
         showMagnitudeToggle.setToggleState(responseTrace.getShowMagnitudeTrace(), juce::NotificationType::dontSendNotification);
@@ -171,6 +180,22 @@ public:
         grid.setFrequencyNormalisableRange(frequencyRange);
         grid.setDecibelNormalisableRange(decibelRange);
 
+        dbLabelTop.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
+        dbLabelTop.setJustificationType(juce::Justification::centred);
+        dbLabelTop.setText(juce::String(static_cast<int>(dbRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+        
+        dbLabelBottom.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
+        dbLabelBottom.setJustificationType(juce::Justification::centred);
+        dbLabelBottom.setText(juce::String(static_cast<int>(dbRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+
+        freqLabelLeft.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
+        freqLabelLeft.setJustificationType(juce::Justification::centredRight);
+        freqLabelLeft.setText(juce::String(static_cast<int>(freqRangeSlider.getMinValue())), juce::NotificationType::dontSendNotification);
+
+        freqLabelRight.setColour(juce::Label::ColourIds::textColourId, juce::Colours::azure);
+        freqLabelRight.setJustificationType(juce::Justification::centredLeft);
+        freqLabelRight.setText(juce::String(static_cast<int>(freqRangeSlider.getMaxValue())), juce::NotificationType::dontSendNotification);
+
         addAndMakeVisible(grid);
         addAndMakeVisible(responseTrace);
 
@@ -178,6 +203,11 @@ public:
         addAndMakeVisible(freqRangeSlider);
         addAndMakeVisible(showMagnitudeToggle);
         addAndMakeVisible(showPhaseToggle);
+
+        addAndMakeVisible(dbLabelTop);
+        addAndMakeVisible(dbLabelBottom);
+        addAndMakeVisible(freqLabelLeft);
+        addAndMakeVisible(freqLabelRight);
     }
 
     void paint(juce::Graphics& g)
@@ -187,16 +217,31 @@ public:
 
     void resized() override
     {
+        const auto elHeight = 30;
+        const auto elWidth = 40;
+
         auto bounds = getLocalBounds();
 
-        auto toggleRegion = bounds.removeFromTop(40);
+        auto toggleRegion = bounds.removeFromTop(elHeight);
 
         showMagnitudeToggle.setBounds(toggleRegion.removeFromLeft(toggleRegion.getWidth() / 2));
         showPhaseToggle.setBounds(toggleRegion);
 
-        dbRangeSlider.setBounds(bounds.removeFromLeft(30));
-        freqRangeSlider.setBounds(bounds.removeFromTop(30));
+        // draw freq range
+        auto freqRangeRegion = bounds.removeFromTop(elHeight);
 
+        freqLabelLeft.setBounds(freqRangeRegion.removeFromLeft(elWidth));
+        freqLabelRight.setBounds(freqRangeRegion.removeFromRight(elWidth));
+        freqRangeSlider.setBounds(freqRangeRegion);
+
+        // draw db range
+        auto dbRangeRegion = bounds.removeFromLeft(elWidth);
+
+        dbLabelTop.setBounds(dbRangeRegion.removeFromTop(elHeight));
+        dbLabelBottom.setBounds(dbRangeRegion.removeFromBottom(elHeight));
+        dbRangeSlider.setBounds(dbRangeRegion);
+
+        // draw grid and trace
         grid.setBounds(bounds);
         responseTrace.setBounds(bounds);
     }
@@ -209,6 +254,7 @@ private:
     juce::Slider freqRangeSlider{ "freqRange" };
     juce::ToggleButton showMagnitudeToggle{ "mag" };
     juce::ToggleButton showPhaseToggle{ "phase" };
+    juce::Label dbLabelTop, dbLabelBottom, freqLabelLeft, freqLabelRight;
 };
 
 //==============================================================================
@@ -235,6 +281,10 @@ private:
     AttachedCombo  filterTypeCombo;
     AttachedToggle autoqToggle;
     TraceAndGrid   responseTrace;
+
+    // ! warning ! - this parameter will interrupt audio processing and so is not to be automated
+    juce::Slider parameterSmoothingSlider{ "smoothing" };
+    juce::Label parameterSmoothingSliderLabel{ "", parameterSmoothingSlider.getName() };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeddvasvfAudioProcessorEditor)
 };

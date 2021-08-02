@@ -88,7 +88,6 @@ namespace dsp
     {
         sampleRate = spec.sampleRate;
 
-        //update();   // create state from defaults
         filterProcessor.prepare(spec);
 
         reset();
@@ -133,7 +132,6 @@ namespace dsp
 
         switch (filterType)
         {
-        //case FilterType::none:      newState = new VASVF::State<SampleType>(); break;
         case FilterType::lowpass:   newState = VASVF::State<SampleType>::makeLowpass(sampleRate, sf, sg, sq, autoQ);   break;
         case FilterType::bandpass:  newState = VASVF::State<SampleType>::makeBandpass(sampleRate, sf, sg, sq, autoQ);  break;
         case FilterType::highpass:  newState = VASVF::State<SampleType>::makeHighpass(sampleRate, sf, sg, sq, autoQ);  break;
@@ -156,13 +154,6 @@ namespace dsp
             shouldUpdate = false;
         }
     }
-
-    /*template<typename SampleType>
-    SampleType VASVFProcessor<SampleType>::processSample(SampleType v0) noexcept
-    {
-        return filterProcessor.processSample(v0);
-    }*/
-
 
 //=====================================
 template class VASVFProcessor<float>;

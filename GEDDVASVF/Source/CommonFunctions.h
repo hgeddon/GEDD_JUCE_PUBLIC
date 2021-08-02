@@ -22,9 +22,10 @@ namespace gedd
 
     // Create a NormalisableRange of template type with frequency scaling
     template <typename Type = float>
-    static juce::NormalisableRange<Type> createFrequencyRange(Type min, Type max)
+    static juce::NormalisableRange<Type> createFrequencyRange(Type min, Type max, Type interval = static_cast<Type>(0))
     {
-        return juce::NormalisableRange<Type>(min, max,
+        // have to create it and move it if we want to set the 'interval' parameter
+        auto x = juce::NormalisableRange<Type>(min, max,
             [](Type start, Type end, Type value) mutable    // from 0 to 1
             {
                 const auto startLog = std::log(start);
@@ -37,6 +38,10 @@ namespace gedd
                 const auto endLog = std::log(end);
                 return (std::log(value) - startLog) / (endLog - startLog);
             });
+
+        x.interval = interval;
+
+        return std::move(x);
     }
 
     // Basic float to text / text to float conversion methods

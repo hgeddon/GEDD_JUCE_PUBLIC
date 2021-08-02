@@ -246,7 +246,6 @@ void VASVFTraceComponent::updatePhases()
 void VASVFTraceComponent::createMagnitudePlot()
 {
     const auto bounds = getLocalBounds();
-    const auto pixelsPerValue = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
     const auto xScale = static_cast<double>(bounds.getWidth()) / static_cast<double>(numPoints - 1);
     const auto gainFloor = static_cast<double>(juce::Decibels::decibelsToGain(decibelRange.start));
     const auto gainCeiling = static_cast<double>(juce::Decibels::decibelsToGain(decibelRange.end));
@@ -271,9 +270,6 @@ void VASVFTraceComponent::createMagnitudePlot()
 void VASVFTraceComponent::createPhasePlot()  // rather than db shouldn't it be in phases?
 {
     auto bounds = getLocalBounds();
-    //const auto ppv = 4.0 * bounds.getHeight() / juce::Decibels::decibelsToGain(decibelRange.end);
-    //const auto pixelsPerValue = 1.0 / bounds.getHeight();
-
     const auto xScale = static_cast<double>(bounds.getWidth()) / static_cast<double>(numPoints - 1);
     const auto phaseFloor = -juce::MathConstants<double>::pi;
     const auto phaseCeiling = juce::MathConstants<double>::pi;

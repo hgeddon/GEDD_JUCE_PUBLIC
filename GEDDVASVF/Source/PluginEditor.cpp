@@ -29,6 +29,18 @@ GeddvasvfAudioProcessorEditor::GeddvasvfAudioProcessorEditor (GeddvasvfAudioProc
     addAndMakeVisible(gainSlider);
     addAndMakeVisible(autoqToggle);
     addAndMakeVisible(responseTrace);
+    addAndMakeVisible(parameterSmoothingSlider);
+
+    parameterSmoothingSliderLabel.attachToComponent(&parameterSmoothingSlider, false);
+    parameterSmoothingSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+    parameterSmoothingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 30);
+    parameterSmoothingSlider.setTextValueSuffix(" s");
+    parameterSmoothingSlider.setRange(juce::Range<double>(0.001, 1.0), 0.0);
+    parameterSmoothingSlider.setNumDecimalPlacesToDisplay(3);
+
+    parameterSmoothingSlider.onValueChange = [&] {
+        audioProcessor.getSvfProcessorRef().setRampDurationSeconds(parameterSmoothingSlider.getValue());
+    };
 }
 
 GeddvasvfAudioProcessorEditor::~GeddvasvfAudioProcessorEditor()
@@ -44,13 +56,11 @@ void GeddvasvfAudioProcessorEditor::paint (juce::Graphics& g)
 
 void GeddvasvfAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
     const auto sliderWidth = 80;
     const auto comboHeight = 80;
 
     auto bounds = getLocalBounds();
-    auto controlRegion = bounds.removeFromLeft(sliderWidth * 3);
+    auto controlRegion = bounds.removeFromLeft(sliderWidth * 4);
 
     autoqToggle.setBounds(controlRegion.removeFromTop(comboHeight));
     filterTypeCombo.setBounds(controlRegion.removeFromTop(comboHeight));
@@ -58,6 +68,8 @@ void GeddvasvfAudioProcessorEditor::resized()
     freqSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
     qSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
     gainSlider.setBounds(controlRegion.removeFromLeft(sliderWidth));
+
+    parameterSmoothingSlider.setBounds(controlRegion);
 
     responseTrace.setBounds(bounds.reduced(30));
 }

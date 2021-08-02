@@ -96,7 +96,6 @@ private:
 
     void fillFrequencyVector();
 
-    // just do lowpass for now
     void updateMagnitudes();
 
     void updatePhases();
